@@ -1,5 +1,12 @@
 .canvas-container {
     border: 1px solid black;
-    height: 400px;
-    width: 600px;
+    height: 500px;
+    position: relative;
+    width: 700px;
+}
+
+.lil-gui {
+    position: absolute;
+    right: 20px;
+    top: 0px;
 }
