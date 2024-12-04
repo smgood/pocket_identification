@@ -6,7 +6,7 @@ import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { GLTFLoader } from 'three-stdlib';
 import GUI from 'lil-gui';
-import rgbIdToEntityIdMap from "../../../data_dump/rgb_id_to_entity_id_map.json";
+import rgbIdToEntityIdMap from '../../../data_dump/rgb_id_to_entity_id_map.json';
 
 interface ModelEntity {
     bufferGeometry: THREE.BufferGeometry;
@@ -21,18 +21,18 @@ interface Settings {
 
 // Display modes for viewing mesh.
 enum displayMode {
-    pocket = "Pocket",
-    colorMap = "Color Map",
-}
-
-// Convert Color to dash seperated string EG: 255-0-100.
-function getRgbDashString(color: THREE.Color): string {
-    return Math.floor(255 * color.r) + '-'
-        + Math.floor(255 * color.g)  + '-'
-        + Math.floor(255 * color.b) ;
+    colorMap = 'Color Map',
+    pocket = 'Pocket',
 }
 
 export const Model = ({isEntityPartOfPocket}): JSX.Element => {
+    // Convert color to dash seperated string EG: 255-0-100.
+    function getRgbDashString(color: THREE.Color): string {
+        return Math.floor(255 * color.r) + '-'
+            + Math.floor(255 * color.g)  + '-'
+            + Math.floor(255 * color.b) ;
+    }
+
     // Get entity's color based on display mode.
     function getColor(settings: Settings, entity: ModelEntity): string {
         if (settings.mode == displayMode.colorMap) {
