@@ -27,8 +27,16 @@ enum displayMode {
 }
 
 export const Model = ({isEntityPartOfPocket}): JSX.Element => {
-    function isTransparent(): boolean {
-      return settings && settings.transparent;
+    /*
+    Determine the opacity of an entity's mesh. If in pocket mode, make entities
+    that are part of a pocket opaque, even if transparent is checked. 
+    */
+    function isMeshTransparent(entity: ModelEntity): boolean {
+      if (settings && settings.transparent) {
+          return settings.mode != displayMode.pocket || !isEntityPartOfPocket(entity.entityId)
+      }
+
+      return false;
     }
 
     // Convert color to dash seperated string EG: 255-0-100.
@@ -48,6 +56,18 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
         return isEntityPartOfPocket(entity.entityId)
             ? 'rgb(255, 0, 0)'
             : 'rgb(150, 150, 150)';
+    }
+
+    function createStandardMaterial(entity: ModelEntity) {
+        var isTransparent = isMeshTransparent(entity);
+        return (
+            <meshStandardMaterial
+                color={getColor(entity)}
+                opacity={isTransparent ? 0.5 : 1.0}
+                transparent={true}
+                depthWrite={!isTransparent}
+            />
+        );
     }
 
     // Create a point light. The position is relative to the camera's position.
@@ -126,12 +146,7 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
                                 geometry={ent.bufferGeometry}
                                 key={index}
                             >
-                                <meshStandardMaterial
-                                    color={getColor(ent)}
-                                    opacity={isTransparent() ? 0.5 : 1.0}
-                                    transparent={true}
-                                    depthWrite={!isTransparent()}
-                                />
+                                {createStandardMaterial(ent)}
                             </mesh>
                         ))
                     }
