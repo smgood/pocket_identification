@@ -3,9 +3,9 @@ import adjacencyGraphEdgeMetadata from '../../data_dump/adjacency_graph_edge_met
 import entityGeometryInfo from '../../data_dump/entity_geometry_info.json';
 
 export default class PocketDetector {
-  entityIds: string[];
-  concaveEntities: Set<string>;
-  pocketCount: number;
+  private entityIds: string[];
+  private concaveEntities: Set<string>;
+  private pocketCount: number;
 
   constructor() {
       this.isEntityPartOfPocket = this.isEntityPartOfPocket.bind(this);
@@ -26,7 +26,7 @@ export default class PocketDetector {
       this.pocketCount = this.determinePocketCount();
   }
 
-  determinePocketCount(): number {
+  private determinePocketCount(): number {
     const concaveEntitiesList = Array.from(this.concaveEntities);
     const unvisitedConcaveEntities = new Set([...concaveEntitiesList]);
     var pocketCount = 0;
@@ -42,7 +42,7 @@ export default class PocketDetector {
     return pocketCount;
   }
 
-  checkNeighbors(currentEntityId, unvisitedConcaveEntities) {
+  private checkNeighbors(currentEntityId, unvisitedConcaveEntities) {
       const neighbors = adjacencyGraph[currentEntityId];
       for (var i = 0; i < neighbors.length; i++) {
           const neighborId = neighbors[i];
@@ -53,11 +53,10 @@ export default class PocketDetector {
       }
   }
 
-  isEntityPartOfPocket(entityId: string): boolean {
-      return this.concaveEntities.has(entityId);
-  }
+  // Returns whether an entity is part of a pocket.
+  public isEntityPartOfPocket = (entityId: string) =>
+      this.concaveEntities.has(entityId);
 
-  getPocketCount(): number {
-      return this.pocketCount;
-  }
+  // Returns the total number of pockets in the 3d object.
+  public getPocketCount = () => this.pocketCount;
 }
