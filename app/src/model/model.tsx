@@ -17,6 +17,7 @@ interface ModelEntity {
 // GUI settings for the Three.js scene.
 interface Settings {
     mode : displayMode;
+    transparent : boolean;
 };
 
 // Display modes for viewing mesh.
@@ -26,6 +27,10 @@ enum displayMode {
 }
 
 export const Model = ({isEntityPartOfPocket}): JSX.Element => {
+    function isTransparent(): boolean {
+      return settings && settings.transparent;
+    }
+
     // Convert color to dash seperated string EG: 255-0-100.
     function getRgbDashString(color: THREE.Color): string {
         return Math.floor(255 * color.r) + '-'
@@ -34,7 +39,7 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
     }
 
     // Get entity's color based on display mode.
-    function getColor(settings: Settings, entity: ModelEntity): string {
+    function getColor(entity: ModelEntity): string {
         if (settings.mode == displayMode.colorMap) {
             return entity.color.getStyle();
         }
@@ -54,15 +59,21 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
     }
 
     function setupGui() {
-      const gui = new GUI( { container: inputRef.current } );
+      const gui = new GUI({container: inputRef.current});
       const settings : Settings = {
           mode: displayMode.pocket,
+          transparent: false,
       };
       setSettings(settings);
       gui.add(settings, 'mode', [displayMode.pocket, displayMode.colorMap])
           .name('Display mode')
           .onChange(newValue => {
               setSettings(prevSettings => ({ ...prevSettings, mode: newValue}));
+          });
+      gui.add(settings, 'transparent')
+          .name('Transparent')
+          .onChange(newValue => {
+              setSettings(prevSettings => ({ ...prevSettings, transparent: newValue}));
           });
       setGui(gui);
 
@@ -115,7 +126,12 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
                                 geometry={ent.bufferGeometry}
                                 key={index}
                             >
-                                <meshStandardMaterial color={getColor(settings, ent)} />
+                                <meshStandardMaterial
+                                    color={getColor(ent)}
+                                    opacity={isTransparent() ? 0.5 : 1.0}
+                                    transparent={true}
+                                    depthWrite={!isTransparent()}
+                                />
                             </mesh>
                         ))
                     }
