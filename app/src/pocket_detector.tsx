@@ -12,7 +12,7 @@ export default class PocketDetector {
 
       this.entityIds = entityGeometryInfo.map(entity => entity["entityId"]);
       this.convexEntities = new Set<string>(this.entityIds);
-      var edges = Object.keys(adjacencyGraphEdgeMetadata);
+      const edges = Object.keys(adjacencyGraphEdgeMetadata);
 
       // Remove all Convex entities
       for (var i = 0; i < edges.length; i++) {
@@ -27,12 +27,12 @@ export default class PocketDetector {
   }
 
   determinePocketCount(): number {
+    const convexEntitiesList = Array.from(this.convexEntities);
+    const unvisitedConvexEntities = new Set([...convexEntitiesList]);
     var pocketCount = 0;
-    var convexEntitiesList = Array.from(this.convexEntities);
-    var unvisitedConvexEntities = new Set([...convexEntitiesList]);
 
     for (var i = 0; i < convexEntitiesList.length; i++) {
-        var entityId = convexEntitiesList[i];
+        const entityId = convexEntitiesList[i];
         if (unvisitedConvexEntities.has(entityId)){
             pocketCount++;
             this.checkNeighbors(entityId, unvisitedConvexEntities);
@@ -45,7 +45,7 @@ export default class PocketDetector {
   checkNeighbors(currentEntityId, unvisitedConvexEntities) {
       const neighbors = adjacencyGraph[currentEntityId];
       for (var i = 0; i < neighbors.length; i++) {
-          var neighborId = neighbors[i];
+          const neighborId = neighbors[i];
           if (unvisitedConvexEntities.has(neighborId)) {
               unvisitedConvexEntities.delete(neighborId);
               this.checkNeighbors(neighborId, unvisitedConvexEntities);
