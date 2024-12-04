@@ -53,12 +53,32 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
         return light;
     }
 
+    function setupGui() {
+      const gui = new GUI( { container: inputRef.current } );
+      const settings : Settings = {
+          mode: displayMode.pocket,
+      };
+      setSettings(settings);
+      gui.add(settings, 'mode', [displayMode.pocket, displayMode.colorMap])
+          .name('Display mode')
+          .onChange(newValue => {
+              setSettings(prevSettings => ({ ...prevSettings, mode: newValue}));
+          });
+      setGui(gui);
+
+      return () => {
+          gui.destroy();
+      };
+    }
+
     const [modelEnts, setModelEnts] = React.useState<ModelEntity[]>([]);
     const [gui, setGui] = React.useState<GUI | null>(null);
     const [settings, setSettings] = React.useState<Settings | null>(null);
     const inputRef = React.useRef(null);
 
     React.useEffect(() => {
+        setupGui();
+
         new GLTFLoader().load('./colored_glb.glb', gltf => {
             const newModuleEntities: ModelEntity[] = [];
             gltf.scene.traverse(element => {
@@ -76,22 +96,6 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
             });
             setModelEnts(newModuleEntities);
         });
-
-        const gui = new GUI( { container: inputRef.current } );
-        const settings : Settings = {
-            mode: displayMode.pocket,
-        };
-        setSettings(settings);
-        gui.add(settings, 'mode', [displayMode.pocket, displayMode.colorMap])
-          	.name('Display mode')
-          	.onChange(newValue => {
-                setSettings(prevSettings => ({ ...prevSettings, mode: newValue}));
-          	});
-        setGui(gui);
-
-        return () => {
-            gui.destroy();
-        };
     }, [])
 
     return (
