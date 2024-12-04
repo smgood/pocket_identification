@@ -32,16 +32,27 @@ function getRgbDashString(color: THREE.Color): string {
         + Math.floor(255 * color.b) ;
 }
 
-// Get entity's color based on display mode.
-function getColor(settings: Settings, entity: ModelEntity): string {
-    if (settings.mode == displayMode.colorMap) {
-        return entity.color.getStyle();
+export const Model = ({isEntityPartOfPocket}): JSX.Element => {
+    // Get entity's color based on display mode.
+    function getColor(settings: Settings, entity: ModelEntity): string {
+        if (settings.mode == displayMode.colorMap) {
+            return entity.color.getStyle();
+        }
+
+        // Color entities part of a pocket red.
+        return isEntityPartOfPocket(entity.entityId)
+            ? 'rgb(255, 0, 0)'
+            : 'rgb(150, 150, 150)';
     }
 
-    return 'rgb(100, 100, 100)';
-}
+    // Create a point light. The position is relative to the camera's position.
+    function createPointLight(): THREE.PointLight {
+        const light = new THREE.PointLight();
+        light.position.set(0, 100, 0);
+        light.intensity= 1;
+        return light;
+    }
 
-export const Model = (): JSX.Element => {
     const [modelEnts, setModelEnts] = React.useState<ModelEntity[]>([]);
     const [gui, setGui] = React.useState<GUI | null>(null);
     const [settings, setSettings] = React.useState<Settings | null>(null);
@@ -85,9 +96,13 @@ export const Model = (): JSX.Element => {
 
     return (
         <div className="canvas-container" ref={inputRef}>
-            <Canvas camera={{ position: [0, 0, 300] }} >
-                <ambientLight />
-                <pointLight intensity={0.5} position={[0, 100, 0]} />
+            <Canvas camera={{position: [300, 300, 0]}}
+                onCreated={({camera, scene}) => {
+                    camera.add(createPointLight());
+                    scene.add(camera);
+                }}
+            >
+                <ambientLight intensity={0.5} />
                 <OrbitControls makeDefault />
                 <group>
                     {
