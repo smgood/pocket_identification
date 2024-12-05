@@ -9,7 +9,10 @@ function App() {
     return (
         <React.Fragment>
             <span>Pocket Detection</span>
-            <Model isEntityPartOfPocket={pocketDetector.isEntityPartOfPocket} />
+            <Model
+                getEntityPocketNumber={pocketDetector.getEntityPocketNumber}
+                pocketCount={pocketDetector.getPocketCount()}
+            />
             <span>Pocket Count: {pocketDetector.getPocketCount()}</span>
         </React.Fragment>
     );

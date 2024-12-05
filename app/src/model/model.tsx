@@ -26,14 +26,12 @@ enum displayMode {
     pocket = 'Pocket',
 }
 
-export const Model = ({isEntityPartOfPocket}): JSX.Element => {
-    /*
-    Determine the opacity of an entity's mesh. If in pocket mode, make entities
-    that are part of a pocket opaque, even if transparent is checked. 
-    */
+export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
+    // Determine the opacity of an entity's mesh. If in pocket mode, make entities
+    // that are part of a pocket opaque, even if transparent is checked.
     function isMeshTransparent(entity: ModelEntity): boolean {
       if (settings && settings.transparent) {
-          return settings.mode != displayMode.pocket || !isEntityPartOfPocket(entity.entityId)
+          return settings.mode != displayMode.pocket || getEntityPocketNumber(entity.entityId) == null
       }
 
       return false;
@@ -53,7 +51,7 @@ export const Model = ({isEntityPartOfPocket}): JSX.Element => {
         }
 
         // Color entities part of a pocket red.
-        return isEntityPartOfPocket(entity.entityId)
+        return getEntityPocketNumber(entity.entityId) != null
             ? 'rgb(255, 0, 0)'
             : 'rgb(150, 150, 150)';
     }
