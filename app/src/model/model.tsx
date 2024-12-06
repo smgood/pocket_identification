@@ -51,8 +51,9 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
         }
 
         // Color entities part of a pocket red.
-        return getEntityPocketNumber(entity.entityId) != null
-            ? 'rgb(255, 0, 0)'
+        const pocketNumber = getEntityPocketNumber(entity.entityId);
+        return pocketNumber != null
+            ? pocketColors[pocketNumber]
             : 'rgb(150, 150, 150)';
     }
 
@@ -100,13 +101,27 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
       };
     }
 
+    // Assign a random color to each pocket.
+    function setupPocketColors() {
+        const colors = [];
+        for (var i = 0; i < pocketCount; i++) {
+            colors.push('rgb('
+                + Math.round(Math.random() * 255) + ','
+                + Math.round(Math.random() * 255) + ','
+                + Math.round(Math.random() * 255) + ')');
+        }
+        setPocketColors(colors);
+    }
+
     const [modelEnts, setModelEnts] = React.useState<ModelEntity[]>([]);
     const [gui, setGui] = React.useState<GUI | null>(null);
     const [settings, setSettings] = React.useState<Settings | null>(null);
+    const [pocketColors, setPocketColors] = React.useState<string[]>([]);
     const inputRef = React.useRef(null);
 
     React.useEffect(() => {
         setupGui();
+        setupPocketColors();
 
         new GLTFLoader().load('./colored_glb.glb', gltf => {
             const newModuleEntities: ModelEntity[] = [];
