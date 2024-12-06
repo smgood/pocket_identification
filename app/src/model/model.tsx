@@ -24,7 +24,7 @@ interface Settings {
 enum displayMode {
     colorMap = 'Color Map',
     pocket = 'Pockets (Default)',
-    uniquePocket = 'Pockets (Random Color)'
+    randomPocketColor = 'Pockets (Random Color)'
 }
 
 // Material colors for entities.
@@ -36,15 +36,14 @@ export const Model = ({
     pocketCount,
     getEntityPocketNumber,
     onUpdateSelectedEntity}): JSX.Element => {
-    // Determine the opacity of an entity's mesh. If in pocket mode, make entities
-    // that are part of a pocket opaque, even if transparent is checked.
+    // Determine if a mesh is transparent. If in pocket mode, make entities that
+    // are part of a pocket opaque, even if transparent setting is checked.
     function isMeshTransparent(entity: ModelEntity): boolean {
-      if (settings.transparent) {
-          return settings.mode == displayMode.colorMap || 
-              getEntityPocketNumber(entity.entityId) == null;
-      }
-
-      return false;
+        if (settings.transparent) {
+            return settings.mode == displayMode.colorMap ||
+                getEntityPocketNumber(entity.entityId) == null;
+        }
+        return false;
     }
 
     // Convert color to dash seperated string EG: 255-0-100.
@@ -67,7 +66,7 @@ export const Model = ({
             if (pocketNumber == selectedPocketNumber) {
                 return highlightColor;
             }
-            if (settings.mode == displayMode.uniquePocket) {
+            if (settings.mode == displayMode.randomPocketColor) {
                 return pocketColors[pocketNumber];
             }
             return pocketColor;
@@ -96,30 +95,31 @@ export const Model = ({
     }
 
     function setupGui() {
-      const gui = new GUI({container: inputRef.current});
-      const settings : Settings = {
-          mode: displayMode.pocket,
-          transparent: false,
-      };
-      setSettings(settings);
-      gui.add(settings, 'mode', [
-          displayMode.pocket,
-          displayMode.uniquePocket,
-          displayMode.colorMap])
-          .name('Display mode')
-          .onChange(newValue => {
-              setSettings(prevSettings => ({...prevSettings, mode: newValue}));
-          });
-      gui.add(settings, 'transparent')
-          .name('Transparent')
-          .onChange(newValue => {
-              setSettings(prevSettings => ({...prevSettings, transparent: newValue}));
-          });
-      setGui(gui);
+        const gui = new GUI({container: inputRef.current});
+        const settings : Settings = {
+            mode: displayMode.pocket,
+            transparent: false,
+        };
+        setSettings(settings);
+        gui.add(settings, 'mode', [
+            displayMode.pocket,
+            displayMode.randomPocketColor,
+            displayMode.colorMap])
+            .name('Display mode')
+            .onChange(newValue => {
+                setSettings(prevSettings => ({...prevSettings, mode: newValue}));
+            });
+        gui.add(settings, 'transparent')
+            .name('Transparent')
+            .onChange(newValue => {
+                setSettings(prevSettings =>
+                    ({...prevSettings, transparent: newValue}));
+            });
+        setGui(gui);
 
-      return () => {
-          gui.destroy();
-      };
+        return () => {
+            gui.destroy();
+        };
     }
 
     // Assign a random color to each pocket.
@@ -180,7 +180,8 @@ export const Model = ({
 
                 const meshElement = element as THREE.Mesh;
                 const geometry = meshElement.geometry as THREE.BufferGeometry;
-                const material = meshElement.material as THREE.MeshStandardMaterial;
+                const material =
+                    meshElement.material as THREE.MeshStandardMaterial;
                 const color = material.color as THREE.Color;
                 const entityId = rgbIdToEntityIdMap[getRgbDashString(color)];
                 newModuleEntities.push({
@@ -209,7 +210,8 @@ export const Model = ({
                             <mesh
                                 geometry={ent.bufferGeometry}
                                 key={index}
-                                onPointerMove={(event) => selectEntity(event, ent.entityId)}
+                                onPointerMove={(event) =>
+                                    selectEntity(event, ent.entityId)}
                                 onPointerLeave={() => unselectEntity()}
                             >
                                 {createStandardMaterial(ent)}
