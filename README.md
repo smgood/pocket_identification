@@ -22,7 +22,7 @@ Run `npm start` to set up a node server.
 
 2. app/src/pocket_detector.tsx: This class determines how many pockets exist in the 3d object and which entities are a part of each pocket. This is computed by identifying entities with concave edges and grouping neighboring entities into buckets.
 
-3. app/src/model/model.tsx: This element renders the model defined in the colored_glb.glb file in a three.js scene. Settings are provided via a lil-gui panel.
+3. app/src/model/model.tsx: This element renders the model defined in the colored_glb.glb file in a react-three scene. Settings are displayed in a panel using the lil-gui controller library.
 
 ## Additional potential features
 
