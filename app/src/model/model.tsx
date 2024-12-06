@@ -32,7 +32,10 @@ const pocketColor = 'rgb(255, 0, 0)';
 const highlightColor = 'rgb(255, 255, 0)';
 const defaultColor = 'rgb(150, 150, 150)';
 
-export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
+export const Model = ({
+    pocketCount,
+    getEntityPocketNumber,
+    onUpdateSelectedEntity}): JSX.Element => {
     // Determine the opacity of an entity's mesh. If in pocket mode, make entities
     // that are part of a pocket opaque, even if transparent is checked.
     function isMeshTransparent(entity: ModelEntity): boolean {
@@ -137,14 +140,22 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
     // of onPointerEnter because mesh is determined using a raycast. An occluded
     // mesh could be entered, causing unwanted effects.
     function selectEntity(event: ThreeEvent<PointerEvent>, entityId: string) {
-      setSelectedEntityId(entityId);
-      setSelectedPocketNumber(getEntityPocketNumber(entityId));
-      event.stopPropagation()
+        setSelectedEntityId(entityId);
+        setSelectedPocketNumber(getEntityPocketNumber(entityId));
+        event.stopPropagation()
+
+        if (settings.mode == displayMode.colorMap) {
+            onUpdateSelectedEntity(entityId);
+        }
     }
 
     function unselectEntity() {
-      setSelectedEntityId(null);
-      setSelectedPocketNumber(null);
+        setSelectedEntityId(null);
+        setSelectedPocketNumber(null);
+
+        if (settings.mode == displayMode.colorMap) {
+            onUpdateSelectedEntity(null);
+        }
     }
 
     const [modelEnts, setModelEnts] = React.useState<ModelEntity[]>([]);

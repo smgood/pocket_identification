@@ -4,7 +4,20 @@ import ReactDOM from 'react-dom';
 import { Model } from './model/model';
 
 function App() {
+    const [selectedEntityId, setSelectedEntityId] =
+        React.useState<string>(null);
     const pocketDetector = new PocketDetector();
+
+    // Event handler to update selected entity id.
+    const handleUpdateSelectedEntity = (entityId) => {
+        setSelectedEntityId(entityId);
+    };
+
+    // Render selected entity id.
+    const getSelectedEntityId = () =>
+        selectedEntityId != null
+            ? (<div>Entity id: {selectedEntityId}</div>)
+            : (<span></span>);
 
     return (
         <React.Fragment>
@@ -12,8 +25,10 @@ function App() {
             <Model
                 getEntityPocketNumber={pocketDetector.getEntityPocketNumber}
                 pocketCount={pocketDetector.getPocketCount()}
+                onUpdateSelectedEntity={handleUpdateSelectedEntity}
             />
-            <span>Pocket Count: {pocketDetector.getPocketCount()}</span>
+            <div>Pocket Count: {pocketDetector.getPocketCount()}</div>
+            {getSelectedEntityId()}
         </React.Fragment>
     );
 }
