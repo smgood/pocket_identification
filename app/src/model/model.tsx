@@ -76,8 +76,7 @@ export const Model = ({
     }
 
     // Return the entity's material with updated color and transparency set.
-    function getEntityMaterial(entity: ModelEntity):
-        THREE.MeshStandardMaterial {
+    function getMaterial(entity: ModelEntity): THREE.MeshStandardMaterial {
         const material = entity.material;
         const isTransparent = isMeshTransparent(entity.entityId);
 
@@ -222,7 +221,7 @@ export const Model = ({
                             <mesh
                                 geometry={ent.bufferGeometry}
                                 key={index}
-                                material={getEntityMaterial(ent)}
+                                material={getMaterial(ent)}
                                 onPointerMove={(event) =>
                                     selectEntity(event, ent.entityId)}
                                 onPointerLeave={() => unselectEntity()}
