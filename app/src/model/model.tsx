@@ -3,7 +3,7 @@ import './model.css';
 import * as React from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, ThreeEvent } from '@react-three/fiber';
 import { GLTFLoader } from 'three-stdlib';
 import GUI from 'lil-gui';
 import rgbIdToEntityIdMap from '../../../data_dump/rgb_id_to_entity_id_map.json';
@@ -50,11 +50,14 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
             return entity.color.getStyle();
         }
 
-        // Color entities part of a pocket red.
         const pocketNumber = getEntityPocketNumber(entity.entityId);
-        return pocketNumber != null
-            ? pocketColors[pocketNumber]
-            : 'rgb(150, 150, 150)';
+        if (pocketNumber != null) {
+            if (pocketNumber == selectedPocketNumber) {
+                return 'rgb(255,255,0)';
+            }
+            return 'rgb(255, 0, 0)'
+        }
+        return 'rgb(150, 150, 150)';
     }
 
     function createStandardMaterial(entity: ModelEntity) {
@@ -87,12 +90,12 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
       gui.add(settings, 'mode', [displayMode.pocket, displayMode.colorMap])
           .name('Display mode')
           .onChange(newValue => {
-              setSettings(prevSettings => ({ ...prevSettings, mode: newValue}));
+              setSettings(prevSettings => ({...prevSettings, mode: newValue}));
           });
       gui.add(settings, 'transparent')
           .name('Transparent')
           .onChange(newValue => {
-              setSettings(prevSettings => ({ ...prevSettings, transparent: newValue}));
+              setSettings(prevSettings => ({...prevSettings, transparent: newValue}));
           });
       setGui(gui);
 
@@ -113,10 +116,24 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
         setPocketColors(colors);
     }
 
+    // Highlight pocket when hovered over. onPointerMove event is used instead
+    // of onPointerEnter because mesh is determined using a raycast. An occluded
+    // mesh could be entered, causing unwanted effects.
+    function selectPocket(event: ThreeEvent<PointerEvent>, entityId: string) {
+      setSelectedPocketNumber(getEntityPocketNumber(entityId));
+      event.stopPropagation()
+    }
+
+    function unselectPocket() {
+      setSelectedPocketNumber(null);
+    }
+
     const [modelEnts, setModelEnts] = React.useState<ModelEntity[]>([]);
     const [gui, setGui] = React.useState<GUI | null>(null);
     const [settings, setSettings] = React.useState<Settings | null>(null);
     const [pocketColors, setPocketColors] = React.useState<string[]>([]);
+    const [selectedPocketNumber, setSelectedPocketNumber] =
+        React.useState<number[]>(null);
     const inputRef = React.useRef(null);
 
     React.useEffect(() => {
@@ -129,11 +146,12 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
                 if (element.type !== 'Mesh') return;
 
                 const meshElement = element as THREE.Mesh;
+                const geometry = meshElement.geometry as THREE.BufferGeometry;
                 const material = meshElement.material as THREE.MeshStandardMaterial;
                 const color = material.color as THREE.Color;
                 const entityId = rgbIdToEntityIdMap[getRgbDashString(color)];
                 newModuleEntities.push({
-                    bufferGeometry: meshElement.geometry as THREE.BufferGeometry,
+                    bufferGeometry: geometry,
                     color: color,
                     entityId: entityId,
                 });
@@ -158,6 +176,8 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
                             <mesh
                                 geometry={ent.bufferGeometry}
                                 key={index}
+                                onPointerMove={(event) => selectPocket(event, ent.entityId)}
+                                onPointerLeave={() => unselectPocket()}
                             >
                                 {createStandardMaterial(ent)}
                             </mesh>
