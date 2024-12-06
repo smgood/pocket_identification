@@ -141,9 +141,13 @@ export const Model = ({
     // of onPointerEnter because mesh is determined using a raycast. An occluded
     // mesh could be entered, causing unwanted effects.
     function selectEntity(event: ThreeEvent<PointerEvent>, entityId: string) {
-        setSelectedEntityId(entityId);
-        setSelectedPocketNumber(getEntityPocketNumber(entityId));
-        event.stopPropagation()
+        if (settings.mode == displayMode.colorMap ||
+            !settings.transparent ||
+            getEntityPocketNumber(entityId) != null) {
+            setSelectedEntityId(entityId);
+            setSelectedPocketNumber(getEntityPocketNumber(entityId));
+            event.stopPropagation()
+        }
 
         if (settings.mode == displayMode.colorMap) {
             onUpdateSelectedEntity(entityId);
