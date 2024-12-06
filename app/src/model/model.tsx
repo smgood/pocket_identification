@@ -39,8 +39,9 @@ export const Model = ({
     // Determine the opacity of an entity's mesh. If in pocket mode, make entities
     // that are part of a pocket opaque, even if transparent is checked.
     function isMeshTransparent(entity: ModelEntity): boolean {
-      if (settings && settings.transparent) {
-          return settings.mode != displayMode.pocket || getEntityPocketNumber(entity.entityId) == null
+      if (settings.transparent) {
+          return settings.mode == displayMode.colorMap || 
+              getEntityPocketNumber(entity.entityId) == null;
       }
 
       return false;
