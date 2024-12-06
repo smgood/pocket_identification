@@ -27,6 +27,11 @@ enum displayMode {
     uniquePocket = 'Pockets (Random Color)'
 }
 
+// Material colors for entities.
+const pocketColor = 'rgb(255, 0, 0)';
+const highlightColor = 'rgb(255, 255, 0)';
+const defaultColor = 'rgb(150, 150, 150)';
+
 export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
     // Determine the opacity of an entity's mesh. If in pocket mode, make entities
     // that are part of a pocket opaque, even if transparent is checked.
@@ -49,21 +54,21 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
     function getColor(entity: ModelEntity): string {
         if (settings.mode == displayMode.colorMap) {
             return entity.entityId == selectedEntityId
-                ? 'rgb(255, 255, 0)'
+                ? highlightColor
                 : entity.color.getStyle();
         }
 
         const pocketNumber = getEntityPocketNumber(entity.entityId);
         if (pocketNumber != null) {
             if (pocketNumber == selectedPocketNumber) {
-                return 'rgb(255, 255, 0)';
+                return highlightColor;
             }
             if (settings.mode == displayMode.uniquePocket) {
                 return pocketColors[pocketNumber];
             }
-            return 'rgb(255, 0, 0)'
+            return pocketColor;
         }
-        return 'rgb(150, 150, 150)';
+        return defaultColor;
     }
 
     function createStandardMaterial(entity: ModelEntity) {
@@ -118,12 +123,15 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
         const colors = [];
         for (var i = 0; i < pocketCount; i++) {
             colors.push('rgb('
-                + Math.round(Math.random() * 255) + ','
-                + Math.round(Math.random() * 255) + ','
-                + Math.round(Math.random() * 255) + ')');
+                + getRandomNumber() + ','
+                + getRandomNumber() + ','
+                + getRandomNumber() + ')');
         }
         setPocketColors(colors);
     }
+
+    // Generate random whole number from 0 to 255.
+    const getRandomNumber = (): number => Math.floor(Math.random() * 256);
 
     // Highlight pocket when hovered over. onPointerMove event is used instead
     // of onPointerEnter because mesh is determined using a raycast. An occluded
