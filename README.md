@@ -8,7 +8,7 @@ Run `npm start` to set up a node server.
 
 1. app/src/index.tsx: This is the root of the react application.
 
-2. app/src/pocket_detector.tsx: This class determines how many pockets exist in the 3d object and which entities are a part of each pocket. This is currently used by identifying entities with concave edges and grouping neighboring entities into buckets.
+2. app/src/pocket_detector.tsx: This class determines how many pockets exist in the 3d object and which entities are a part of each pocket. This is computed by identifying entities with concave edges and grouping neighboring entities into buckets.
 
 3. app/src/model/model.tsx: This element renders the model defined in the colored_glb.glb file in a three.js scene. Settings are provided via a lil-gui panel.
 
@@ -22,7 +22,7 @@ Below are some potential features for future development.
 
 ### Add features to improve model visualization.
       - Color each pocket individually to better identify pockets.
-      - Improve transparency feature. There are currently minor issues with rendering.
+      - Improve the transparency setting. There are currently minor issues with rendering.
       - Support raycast in the scene. Show info that may be helpful to the user such as entity number, rgb value, and number of entities in the pocket.
       - Create a list view that displays the entities in each pocket, and highlights a pocket on hover.
       - Add other display modes in Gui such as wireframe and metallic material.
