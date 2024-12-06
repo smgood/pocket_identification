@@ -48,13 +48,15 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
     // Get entity's color based on display mode.
     function getColor(entity: ModelEntity): string {
         if (settings.mode == displayMode.colorMap) {
-            return entity.color.getStyle();
+            return entity.entityId == selectedEntityId
+                ? 'rgb(255, 255, 0)'
+                : entity.color.getStyle();
         }
 
         const pocketNumber = getEntityPocketNumber(entity.entityId);
         if (pocketNumber != null) {
             if (pocketNumber == selectedPocketNumber) {
-                return 'rgb(255,255,0)';
+                return 'rgb(255, 255, 0)';
             }
             if (settings.mode == displayMode.uniquePocket) {
                 return pocketColors[pocketNumber];
@@ -126,12 +128,14 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
     // Highlight pocket when hovered over. onPointerMove event is used instead
     // of onPointerEnter because mesh is determined using a raycast. An occluded
     // mesh could be entered, causing unwanted effects.
-    function selectPocket(event: ThreeEvent<PointerEvent>, entityId: string) {
+    function selectEntity(event: ThreeEvent<PointerEvent>, entityId: string) {
+      setSelectedEntityId(entityId);
       setSelectedPocketNumber(getEntityPocketNumber(entityId));
       event.stopPropagation()
     }
 
-    function unselectPocket() {
+    function unselectEntity() {
+      setSelectedEntityId(null);
       setSelectedPocketNumber(null);
     }
 
@@ -139,8 +143,10 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
     const [gui, setGui] = React.useState<GUI | null>(null);
     const [settings, setSettings] = React.useState<Settings | null>(null);
     const [pocketColors, setPocketColors] = React.useState<string[]>([]);
+    const [selectedEntityId, setSelectedEntityId] =
+        React.useState<string>(null);
     const [selectedPocketNumber, setSelectedPocketNumber] =
-        React.useState<number[]>(null);
+        React.useState<number>(null);
     const inputRef = React.useRef(null);
 
     React.useEffect(() => {
@@ -183,8 +189,8 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
                             <mesh
                                 geometry={ent.bufferGeometry}
                                 key={index}
-                                onPointerMove={(event) => selectPocket(event, ent.entityId)}
-                                onPointerLeave={() => unselectPocket()}
+                                onPointerMove={(event) => selectEntity(event, ent.entityId)}
+                                onPointerLeave={() => unselectEntity()}
                             >
                                 {createStandardMaterial(ent)}
                             </mesh>
