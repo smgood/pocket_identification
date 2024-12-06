@@ -23,7 +23,8 @@ interface Settings {
 // Display modes for viewing mesh.
 enum displayMode {
     colorMap = 'Color Map',
-    pocket = 'Pocket',
+    pocket = 'Pockets (Default)',
+    uniquePocket = 'Pockets (Random Color)'
 }
 
 export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
@@ -54,6 +55,9 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
         if (pocketNumber != null) {
             if (pocketNumber == selectedPocketNumber) {
                 return 'rgb(255,255,0)';
+            }
+            if (settings.mode == displayMode.uniquePocket) {
+                return pocketColors[pocketNumber];
             }
             return 'rgb(255, 0, 0)'
         }
@@ -87,7 +91,10 @@ export const Model = ({pocketCount, getEntityPocketNumber}): JSX.Element => {
           transparent: false,
       };
       setSettings(settings);
-      gui.add(settings, 'mode', [displayMode.pocket, displayMode.colorMap])
+      gui.add(settings, 'mode', [
+          displayMode.pocket,
+          displayMode.uniquePocket,
+          displayMode.colorMap])
           .name('Display mode')
           .onChange(newValue => {
               setSettings(prevSettings => ({...prevSettings, mode: newValue}));
