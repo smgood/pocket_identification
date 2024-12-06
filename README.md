@@ -34,7 +34,6 @@ Below are some potential features for future development.
 
 ### Add features to improve model visualization.
       - To better differentiate pockets, add an outline of each pocket. That way the user can differentiate between pockets that are touching each other without having to hover over the pocket.
-      - Improve the transparency setting. There seems to be a minor bug with the rendering.
       - Add other display options in Gui such as wireframe and metallic material.
       - Add option to display scene in full screen.
       - Improve random color pocket mode by making sure conflicting colors are not randomly generated.

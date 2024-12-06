@@ -12,6 +12,7 @@ interface ModelEntity {
     bufferGeometry: THREE.BufferGeometry;
     color: THREE.Color;
     entityId: string;
+    material: THREE.MeshStandardMaterial;
 }
 
 // GUI settings for the Three.js scene.
@@ -38,10 +39,10 @@ export const Model = ({
     onUpdateSelectedEntity}): JSX.Element => {
     // Determine if a mesh is transparent. If in pocket mode, make entities that
     // are part of a pocket opaque, even if transparent setting is checked.
-    function isMeshTransparent(entity: ModelEntity): boolean {
+    function isMeshTransparent(entityId: string): boolean {
         if (settings.transparent) {
             return settings.mode == displayMode.colorMap ||
-                getEntityPocketNumber(entity.entityId) == null;
+                getEntityPocketNumber(entityId) == null;
         }
         return false;
     }
@@ -74,16 +75,22 @@ export const Model = ({
         return defaultColor;
     }
 
-    function createStandardMaterial(entity: ModelEntity) {
-        var isTransparent = isMeshTransparent(entity);
-        return (
-            <meshStandardMaterial
-                color={getColor(entity)}
-                opacity={isTransparent ? 0.5 : 1.0}
-                transparent={true}
-                depthWrite={!isTransparent}
-            />
-        );
+    // Return the entity's material with updated color and transparency set.
+    function getEntityMaterial(entity: ModelEntity):
+        THREE.MeshStandardMaterial {
+        const material = entity.material;
+        const isTransparent = isMeshTransparent(entity.entityId);
+
+        // The transparency of a material can't be easily changed at runtime. It
+        // requires `material.needsUpdate` to be called.
+        // https://threejs.org/docs/#manual/en/introduction/How-to-update-things
+        material.needsUpdate = material.transparent != isTransparent;
+
+        material.color=new THREE.Color(getColor(entity));
+        material.opacity= isTransparent ? 0.5 : 1.0;
+        material.transparent= isTransparent;
+        material.depthWrite= !isTransparent;
+        return material;
     }
 
     // Create a point light. The position is relative to the camera's position.
@@ -98,7 +105,7 @@ export const Model = ({
         const gui = new GUI({container: inputRef.current});
         const settings : Settings = {
             mode: displayMode.pocket,
-            transparent: false,
+            transparent: true,
         };
         setSettings(settings);
         gui.add(settings, 'mode', [
@@ -192,6 +199,7 @@ export const Model = ({
                     bufferGeometry: geometry,
                     color: color,
                     entityId: entityId,
+                    material: new THREE.MeshStandardMaterial(),
                 });
             });
             setModelEnts(newModuleEntities);
@@ -214,11 +222,11 @@ export const Model = ({
                             <mesh
                                 geometry={ent.bufferGeometry}
                                 key={index}
+                                material={getEntityMaterial(ent)}
                                 onPointerMove={(event) =>
                                     selectEntity(event, ent.entityId)}
                                 onPointerLeave={() => unselectEntity()}
                             >
-                                {createStandardMaterial(ent)}
                             </mesh>
                         ))
                     }
