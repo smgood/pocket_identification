@@ -4,6 +4,18 @@
 
 Run `npm start` to set up a node server.
 
+## Settings
+
+### Display Modes
+
+- Pockets (Default): Display pockets in red. When hovering over a pocket, highlight it in yellow.
+- Pockets (Random Color): To help differentiate pockets, display each pocket in a randomly generated color.
+- Color Map: Display each entity with its assigned unique color. When hovering over an entity, highlight it in yellow and display the entity id below for testing purposes.
+
+### Options
+
+- Transparent: If checked, meshes will be transparent. However, if pocket mode is selected, the pockets will remain opaque.
+
 ## Files of interest
 
 1. app/src/index.tsx: This is the root of the react application.
@@ -21,10 +33,9 @@ Below are some potential features for future development.
       - Solve for the edge case where there is a hole composed of a single cylindrical face.
 
 ### Add features to improve model visualization.
-      - Color each pocket individually to better identify pockets.
-      - Improve the transparency setting. There are currently minor issues with rendering.
-      - Support raycast in the scene. Show info that may be helpful to the user such as entity number, rgb value, and number of entities in the pocket.
-      - Create a list view that displays the entities in each pocket, and highlights a pocket on hover.
+      - To better differentiate pockets, add an outline of each pocket. That way the user can differentiate between pockets that are touching each other without having to hover over the pocket.
+      - Improve the transparency setting. There seems to be minor issues with the rendering.
+      - Create a list view that displays the entities that make up each pocket. When hovering over a list, highlight the corresponding pocket.
       - Add other display modes in Gui such as wireframe and metallic material.
       - Add option to display surface normals via arrows.
       - Add option to display scene in full screen mode.
